@@ -50,7 +50,7 @@ public class Battery extends JFrame
 			System.out.print( getCurrentPowerPercent() + "%" + " " );
 				
 			if (getCurrentPowerPercent() <= LOW_BATTERY_LIFE_THRESHOLD)
-				System.out.print("low battery! \n");
+				System.out.print("lowish battery! \n");
 			
 			currentPower--; 			 
 			
