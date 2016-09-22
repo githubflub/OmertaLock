@@ -1,0 +1,25 @@
+/**
+ * List of the various types of PINs 
+ * that the lock will recognize. 
+ * @author Administrator
+ *
+ */
+public enum PINType {
+	NORMAL_USE, 
+	PROGRAMMING, 
+	TOGGLE_LOCK, 
+	FREEZE, 
+	VIP, 
+	CHANGE_PROGRAMMING_CODE, 
+	ADD_NORMAL_USE, 
+	ADD_TOGGLE, 
+	ADD_FREEZE, 
+	ADD_VIP, 
+	DELETE, 
+	TOGGLE_BEEPER,
+	CHANGE_RELOCK_TIME,
+	EXIT_PROGRAMMING_MODE,
+	REPLACE_BATTERY,
+	RESTORE_FACTORY_DEFAULTS,
+	SELF_DESTRUCT
+}
