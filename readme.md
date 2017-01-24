@@ -1,4 +1,11 @@
+Omerta Lock 
+===
+
+![Screenshot of Omerta Lock]
+(http://i.imgur.com/8CPJiQ4.png)
+
 How to set up: 
+==
 
 I made this in Eclipse Juno, so just clone this into any Eclipse workspace of your choice. Then just import the project using the following steps. 
 
@@ -18,6 +25,7 @@ I made this in Eclipse Juno, so just clone this into any Eclipse workspace of yo
 
 
 How to run: 
+==
 
 1. Select OmertaLock in Package Explorer
 2. Press CTRL+F11 or Run > Run or click the round green button with the white play symbol in it. 
