@@ -1,8 +1,7 @@
 Omerta Lock 
 ===
 
-![Screenshot of Omerta Lock]
-(http://i.imgur.com/8CPJiQ4.png)
+![Screenshot of Omerta Lock](http://i.imgur.com/8CPJiQ4.png)
 
 How to set up: 
 ==
