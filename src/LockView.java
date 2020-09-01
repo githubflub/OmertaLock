@@ -42,7 +42,7 @@ public class LockView extends JFrame
 	private void initComponents()
 	{
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-	    setTitle("Omerta Electronic Lock ");
+	    setTitle("Omerta Electronic Lock");
 	    setSize(270, 600);
 	    setLayout(new BorderLayout());
 	    
@@ -69,6 +69,7 @@ public class LockView extends JFrame
 	 */
 	public void blink(LED blinkDetails)
 	{
+		lockPanel.stopBlinking(); // Just in case it's currently blinking. 
 		lockPanel.blink(blinkDetails); 		 
 	}
 	
@@ -79,6 +80,8 @@ public class LockView extends JFrame
 	 */
 	public void beep(Beeper beepDetails)
 	{
+		// Kill existing lockBeeper if it's still going? 
+		lockBeeper.kill();
 		lockBeeper = beepDetails; 
 		lockBeeper.beep(); 
 	}

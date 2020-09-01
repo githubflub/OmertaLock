@@ -17,6 +17,7 @@ public class Lock
 	private static final PIN ADD_TOGGLE_COMMAND = new PIN(3, PINType.ADD_TOGGLE);
 	private static final PIN ADD_FREEZE_COMMAND = new PIN(4, PINType.ADD_FREEZE);
 	private static final PIN ADD_VIP_COMMAND = new PIN(5, PINType.ADD_VIP);
+	// This should be called DELETE_PIN_COMMAND
 	private static final PIN DELETE_COMMAND = new PIN(6, PINType.DELETE);
 	private static final PIN TOGGLE_BEEPER_COMMAND = new PIN(7, PINType.TOGGLE_BEEPER);
 	private static final PIN CHANGE_RELOCK_TIME_COMMAND = new PIN(8, PINType.CHANGE_RELOCK_TIME);	

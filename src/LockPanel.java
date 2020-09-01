@@ -8,10 +8,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.net.URL; 
 
 public class LockPanel extends JPanel
 {
@@ -31,11 +34,24 @@ public class LockPanel extends JPanel
 	final JButton nine = new JButton("9"); 
 	final JButton pound = new JButton("#"); 
 	
+	static final int VOL_MIN = 0; 
+	static final int VOL_MAX = 1000; 
+	static final int VOL_INIT = 100; 
+	
+	final JLabel volume_slider_label = new JLabel("Volume", JLabel.LEFT); 
+	final JSlider volume_slider = new JSlider(JSlider.HORIZONTAL, VOL_MIN, VOL_MAX, VOL_INIT); 
+	public static int volume = VOL_INIT; 
+	
 	private EventListenerList listenerList = new EventListenerList(); 
 	private LED green; 
 	private LED red; 
 	private int numberOfBlinks;
-	private String blinkColor;	 
+	private URL blinkColor;	 
+	
+	private TimerTask my_red_blink; 
+	private TimerTask my_red_duration; 
+	private TimerTask my_green_blink; 
+	private TimerTask my_green_duration; 
 	
 	/**
 	 * Creates the panel with buttons and lights
@@ -44,6 +60,20 @@ public class LockPanel extends JPanel
 	 */
 	public LockPanel()
 	{
+		volume_slider.addChangeListener(new ChangeListener() 
+			{
+				public void stateChanged(ChangeEvent e) 
+				{
+					JSlider source = (JSlider)e.getSource(); 
+//					if (!source.getValueIsAdjusting()) {
+						int new_volume = (int)source.getValue(); 
+						volume = new_volume; 
+//						System.out.print( "\nYour new volume " + volume + "\n");
+//					}
+				}
+			}
+		);
+		
 		Dimension size = getPreferredSize();
 		size.width = 270; 
 		setPreferredSize(size); 
@@ -54,7 +84,8 @@ public class LockPanel extends JPanel
 		red = new LED( LED.RED_OFF ); 	
 		
 		JLabel speakerholes = new JLabel(); 
-		speakerholes.setIcon(new ImageIcon("res/speakerHoles.png")); 
+		URL speakerholes_url = LockPanel.class.getResource("speakerHoles.png"); 
+		speakerholes.setIcon(new ImageIcon(speakerholes_url)); 
 
 		////////Position the components on the Panel ////////////////////		
 		GridBagConstraints gc = new GridBagConstraints(); 
@@ -98,6 +129,19 @@ public class LockPanel extends JPanel
 		add(omerta, gc);
 		gc.gridwidth = 1;
 		
+		gc.gridx = 0; 
+		gc.gridy = 7;
+		gc.gridwidth = 3;
+		add(volume_slider_label, gc); 
+		add(volume_slider, gc);
+		gc.gridwidth = 1;
+		
+		gc.gridx = 0; 
+		gc.gridy = 8;
+		gc.gridwidth = 3;
+		add(volume_slider, gc);
+		gc.gridwidth = 1;
+		
 		////// Second column //////////////////////////		
 		gc.gridx = 1; 
 		gc.gridy = 2;
@@ -139,6 +183,28 @@ public class LockPanel extends JPanel
 		gc.gridx = 2; 
 		gc.gridy = 5;		
 		add(pound, gc);
+		
+		/*
+		 * Reminder for JavaScript brains:
+		 * Java is a totally class based language, so instead of 
+		 * providing an event handler function, you provide a class
+		 * that implements an event handler function. 
+		 * 
+		 * To save some time, you can both define a class and 
+		 * create an instance of it "on the fly" 
+		 * using this syntax
+		 * 
+		 * new ActionListener() { 
+		 *   // implement event handler function. 
+		 *   public void actionPerformed() {
+		 *   	// Do stuff. 
+		 *   }
+		 * }
+		 * 
+		 * This returns an instance of a class that implements ActionListener. 
+		 * The stuff inside the {} is the class definition. 
+		 * 
+		 */
 		
 		////// Add action listeners to each button /////////////////////
 		one.addActionListener(new ActionListener() 
@@ -294,6 +360,28 @@ public class LockPanel extends JPanel
 		listenerList.add(InputListener.class, listener); 
 	}	
 	
+	public void stopBlinking() 
+	{
+		if (my_red_blink != null) {
+			my_red_blink.cancel();
+		}
+		if (my_red_duration != null) {
+			my_red_duration.cancel(); 
+		}
+		
+		if (my_green_blink != null) {
+			my_green_blink.cancel(); 
+		}
+		if (my_green_duration != null) {
+			my_green_duration.cancel(); 
+		}
+		
+		green.setIcon(new ImageIcon(LED.GREEN_OFF)); 
+		red.setIcon(new ImageIcon(LED.RED_OFF)); 
+		repaint(); 
+			
+	}
+	
 	/**
 	 * Makes the red LED blink. 
 	 * Uses two timers. 
@@ -306,7 +394,7 @@ public class LockPanel extends JPanel
 		long period = (long) LED.BLINK_WAIT_TIME;
 
 		Timer blink = new Timer(); 
-		blink.scheduleAtFixedRate(new TimerTask()
+		my_red_blink = new TimerTask()
 		{
 			int blinkCount = 1; 
 
@@ -322,10 +410,13 @@ public class LockPanel extends JPanel
 					//System.out.println("blinkTimer cancelled");
 				}
 			}
-		}, no_delay, period);
+		}; 
+		
+		blink.scheduleAtFixedRate(my_red_blink, no_delay, period);
 		
 		Timer blinkDurationTimer = new Timer(); 
-		blinkDurationTimer.scheduleAtFixedRate(new TimerTask()
+		
+		my_red_duration = new TimerTask()
 		{
 			int blinkCount = 1; 
 
@@ -340,7 +431,9 @@ public class LockPanel extends JPanel
 					this.cancel();
 				}
 			}
-		}, LED.BLINK_DURATION, LED.BLINK_WAIT_TIME);
+		}; 
+		
+		blinkDurationTimer.scheduleAtFixedRate(my_red_duration, LED.BLINK_DURATION, LED.BLINK_WAIT_TIME);
 	}
 	
 	/**
@@ -356,7 +449,7 @@ public class LockPanel extends JPanel
 		
 
 		Timer blink = new Timer(); 
-		blink.scheduleAtFixedRate(new TimerTask()
+		my_green_blink = new TimerTask()
 		{
 			int blinkCount = 1; 
 
@@ -372,10 +465,12 @@ public class LockPanel extends JPanel
 				}
 			}
 
-		}, no_delay, period);
+		};
+		
+		blink.scheduleAtFixedRate(my_green_blink, no_delay, period);
 		
 		Timer blinkDurationTimer = new Timer(); 
-		blinkDurationTimer.scheduleAtFixedRate(new TimerTask()
+		my_green_duration = new TimerTask()
 		{
 			int blinkCount = 1;			 
 
@@ -390,7 +485,8 @@ public class LockPanel extends JPanel
 					this.cancel();
 				}
 			}
-		}, LED.BLINK_DURATION, LED.BLINK_WAIT_TIME);
+		};
+		blinkDurationTimer.scheduleAtFixedRate(my_green_duration, LED.BLINK_DURATION, LED.BLINK_WAIT_TIME);
 	}
 	
 	/**
@@ -408,4 +504,11 @@ public class LockPanel extends JPanel
 		else 
 			blinkRed(); 
 	}	
+	
+	/**
+	 * If you need to get the volume. 
+	 */
+	public static int getVolume() {
+		return volume; 
+	}
 }

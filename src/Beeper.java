@@ -1,15 +1,16 @@
-import java.applet.Applet;
-import java.applet.AudioClip;
-
+import java.io.File;
+import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.sound.sampled.*;
 
 
 public class Beeper 
 {
 	// "global members" 		
-	public static final String GOOD_BEEP = "/pass.wav";
-	public static final String ERROR_BEEP = "/error.wav"; 
+	public static final String GOOD_BEEP = "pass.wav";
+	public static final String ERROR_BEEP = "error.wav"; 
 	public static final int NO_BEEP = 0; 
 	public static final int ONE_BEEP = 1; 
 	public static final int TWO_BEEPS = 2; 
@@ -17,16 +18,18 @@ public class Beeper
 	public static final int FIVE_BEEPS = 5; 	
 	
 	// old stock Beeps 
-	public static final Beeper sound1= new Beeper("/error.wav", ONE_BEEP);
-	public static final Beeper sound2= new Beeper("/pass.wav", ONE_BEEP);	
+	public static final Beeper sound1= new Beeper(ERROR_BEEP, ONE_BEEP);
+	public static final Beeper sound2= new Beeper(GOOD_BEEP, ONE_BEEP);	
 	
 	// Static members
 	public static final int BEEP_WAIT_TIME_MS = 300;
 	private boolean speakerEnabled; 
 	
 	// Instance Members
-	private AudioClip clip;	
+	private File clip_file;
+	private URL clip_url; 
 	private int numberOfBeeps; 	
+	private TimerTask my_timer_task; 
 	
 	// Constructor 1 
 	public Beeper() 
@@ -62,7 +65,12 @@ public class Beeper
 	{
 		try
 		{
-			clip = Applet.newAudioClip(Beeper.class.getResource(filename));
+			clip_file = new File(filename);
+			clip_url = getClass().getResource(filename); 
+			
+			
+//			clip = Applet.newAudioClip(Beeper.class.getResource(filename));
+			
 		}
 		
 		catch(Exception e)
@@ -80,16 +88,30 @@ public class Beeper
 		return numberOfBeeps; 
 	}
 	
+	/* 
+	 * Stops the beeping. 
+	 * Useful if you need to stop the beeping
+	 * before the audio file finishes playing. 
+	 *
+	 */
+	public void kill() 
+	{
+		if (my_timer_task != null) {
+			my_timer_task.cancel(); 
+			my_timer_task = null; 
+		}
+	}
+	
 	/**
 	 * Beeps using TimerTasks. 
 	 */
 	public void beep()
 	{
 		long delay = 0; 
-		long period = (long) BEEP_WAIT_TIME_MS; 
+		long period = (long) BEEP_WAIT_TIME_MS;
 		
 		Timer beep = new Timer(); 
-		beep.scheduleAtFixedRate(new TimerTask()
+		my_timer_task = new TimerTask()
 		{			
 			int beepCount = 1; 
 			
@@ -103,7 +125,27 @@ public class Beeper
 						{
 							public void run()
 							{
-								clip.play();
+								int volume = LockPanel.getVolume(); 
+//								System.out.println( "Beeping at this volume " + volume);
+								
+								try {
+									AudioInputStream sound = AudioSystem.getAudioInputStream(clip_url);
+									Clip clip = AudioSystem.getClip(); 
+									clip.open(sound); 
+									// Gain control. 
+									FloatControl gain = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN); 
+									double small_v = volume / 1000.00; 
+//									System.out.println( "Beeping at this small_v " + small_v);
+									float dB = (float) (Math.log(small_v) / Math.log(10) * 20); 
+//									System.out.println( "Beeping at this dB " + dB);
+									gain.setValue(dB);
+											
+									clip.start();
+								}
+								catch (Exception error) {
+									error.printStackTrace();
+								}
+								
 							}
 						}.start();
 					}
@@ -117,6 +159,8 @@ public class Beeper
 					this.cancel(); 
 			}
 			
-		}, delay, period);
+		}; 
+		
+		beep.scheduleAtFixedRate(my_timer_task, delay, period);
 	}
 }

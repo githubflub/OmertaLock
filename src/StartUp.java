@@ -14,6 +14,6 @@ public class StartUp
 		LockView theView = new LockView(); 
 		
 		// Start the controller
-		LockController theController = new LockController(theModel, theView); 		
+		new LockController(theModel, theView); 		
 	}	 
 }
