@@ -7,7 +7,7 @@ Omerta Lock
 How to test/use this lock: 
 == 
 
-1. Open OmertaLock.exe
+1. Download OmertaLock.jar from [the releases page](https://github.com/githubflub/omertalock/releases), save it anywhere, and double click to run it. 
 2. You can start unlocking doors immediately by using the default unlock PIN. On the keypad, using your mouse, enter 4321 followed by the # key. If you do this correctly, the green light on the lock will blink twice, and you will hear two beeps at the same time. This means the lock has unlocked. By default, in 5 seconds, the lock will relock, but this will happen in the background, so you won't see this unless you're looking at the Java console. 
 
 3. This lock "runs" on a battery, which is draining constantly. When the battery gets below 25%, the lock will start playing a buzzing sound. When the battery hits 0%, the lock will die and the program will close. You can "replace" or "recharge" the battery by pressing the Omerta button. When you press the Omerta button, the green light will blink and beep 3 times to indicate that the lock is ready to receive special commands such as the one to "recharge" the battery. Enter 1 followed by the # key. After pressing the # key, the green light will blink and beep 3 times again. This will recharge the battery and return the lock to its default state, where it is ready to receive normal commands. For example, you can try entering the default PIN again. 
